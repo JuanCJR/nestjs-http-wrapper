@@ -14,7 +14,9 @@
         "test:watch": "jest --watch",
         "test:coverage": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./test/jest-e2e.json"
+        "test:e2e": "jest --config ./test/jest-e2e.json",
+        "_pre-release:tag": "VERSION=$(node -p \"require('./package.json').version\") && git tag -a \"v$VERSION\" -m \"Release version $VERSION\" && git push --tags",
+        "release": "npm run _pre-release:tag && npm publish"
     },
     "keywords": [
         "nestjs",

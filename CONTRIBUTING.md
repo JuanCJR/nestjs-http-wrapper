@@ -45,29 +45,25 @@ Dado un número de versión `MAJOR.MINOR.PATCH`:
     - Haz un commit con los cambios de versión: `git commit -m "chore(release): version v1.2.0"`.
     - Abre un Pull Request desde tu rama de `release` (o `develop`) hacia la rama `main`.
 
-5.  **Fusionar y Etiquetar (Tag):**
-    - Una vez que el PR es aprobado y fusionado en `main`, asegúrate de estar en la rama `main` y que tienes los últimos cambios (`git pull origin main`).
-    - Crea una etiqueta de Git con el número de la versión:
-      ```bash
-      git tag -a v1.2.0 -m "Release version 1.2.0"
-      ```
-    - Sube la etiqueta al repositorio remoto:
-      ```bash
-      git push --tags
-      ```
+5.  **Fusionar en `main`:**
+    - Una vez que el PR es aprobado, fusiónalo en la rama `main` y asegúrate de tener los últimos cambios en tu local (`git pull origin main`).
 
-6.  **Publicar en NPM:**
-    - Desde la rama `main`, ejecuta el comando para publicar el paquete:
+6.  **Publicar la Nueva Versión:**
+    - Desde la rama `main`, ejecuta el comando de lanzamiento:
       ```bash
-      npm publish
+      npm run release
       ```
+    - Este comando se encargará automáticamente de:
+      - Crear el tag de Git.
+      - Subir el tag al repositorio.
+      - Publicar la nueva versión del paquete en npm.
 
 7.  **Sincronizar `develop`:**
     - Finalmente, fusiona `main` de vuelta a `develop` para que la rama de desarrollo también tenga el último número de versión.
-      ```bash
-      git checkout develop
-      git merge main
-      git push origin develop
-      ```
+    ```bash
+    git checkout develop
+    git merge main
+    git push origin develop
+    ```
 
 ¡Y eso es todo! Siguiendo estos pasos aseguramos un ciclo de vida de desarrollo limpio y predecible.
