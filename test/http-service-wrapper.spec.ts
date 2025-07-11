@@ -3,8 +3,8 @@ import { HttpService } from '@nestjs/axios';
 import {
   HttpServiceWrapper,
   HttpRequestOptions,
-} from './http-service-wrapper.utils';
-import { HttpErrorHelper } from '../http-helper/httpHelper.util';
+} from '../src/services/http-service-wrapper/http-service-wrapper.utils';
+import { HttpErrorHelper } from '../src/services/http-helper/httpHelper.util';
 import { of } from 'rxjs';
 import { AxiosResponse } from 'axios';
 

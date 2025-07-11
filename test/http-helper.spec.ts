@@ -18,9 +18,9 @@ import {
   ServiceUnavailableException,
   HttpException,
 } from '@nestjs/common';
-import { HttpErrorHelper } from './httpHelper.util';
+import { HttpErrorHelper } from '../src/services/http-helper/httpHelper.util';
 import { AxiosResponse } from 'axios';
-import { ErrorResponseDto } from '../../dto/http-helper.dto';
+import { ErrorResponseDto } from '../src/dto/http-helper.dto';
 
 describe('HttpErrorHelper', () => {
   let service: HttpErrorHelper;

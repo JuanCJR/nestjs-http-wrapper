@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { GenericError } from "./error.interface";
+import { ApiProperty } from '@nestjs/swagger';
+import { GenericError } from './error.interface';
 
 export class GenericResponse<T> {
   @ApiProperty()

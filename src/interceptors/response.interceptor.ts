@@ -3,10 +3,10 @@ import {
   ExecutionContext,
   Injectable,
   NestInterceptor,
-} from "@nestjs/common";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { GenericResponse } from "../interfaces/response.interface";
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { GenericResponse } from '../interfaces/response.interface';
 
 @Injectable()
 export class ResponseInterceptor<T>
@@ -14,7 +14,7 @@ export class ResponseInterceptor<T>
 {
   intercept(
     context: ExecutionContext,
-    next: CallHandler
+    next: CallHandler,
   ): Observable<GenericResponse<T>> {
     return next.handle().pipe(
       map(
@@ -23,8 +23,8 @@ export class ResponseInterceptor<T>
             data,
             success: true,
             timestamp: new Date().toISOString(),
-          } as GenericResponse<T>)
-      )
+          }) as GenericResponse<T>,
+      ),
     );
   }
 }

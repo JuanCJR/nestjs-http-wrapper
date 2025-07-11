@@ -5,10 +5,10 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-} from "@nestjs/common";
-import { Request, Response } from "express";
-import { GenericResponse } from "../interfaces/response.interface";
-import { ErrorResponseDto } from "../dto/http-helper.dto";
+} from '@nestjs/common';
+import { Request, Response } from 'express';
+import { GenericResponse } from '../interfaces/response.interface';
+import { ErrorResponseDto } from '../dto/http-helper.dto';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -28,7 +28,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       status = exception.getStatus();
       const errorResponse = exception.getResponse();
 
-      if (typeof errorResponse === "string") {
+      if (typeof errorResponse === 'string') {
         message = errorResponse;
         error = exception.message;
       } else {
@@ -39,13 +39,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
           provider = errorResponse.provider;
         } else {
           message = (errorResponse as any).message ?? exception.message;
-          error = (errorResponse as any).error ?? "Http Exception";
+          error = (errorResponse as any).error ?? 'Http Exception';
         }
       }
     } else {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
-      message = "Internal server error";
-      error = "Internal Server Error";
+      message = 'Internal server error';
+      error = 'Internal Server Error';
     }
 
     const errorDetails = {
@@ -62,7 +62,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ...errorDetails,
         message,
         stack: exception instanceof Error ? exception.stack : undefined,
-      })
+      }),
     );
 
     const errorResponse: GenericResponse<null> = {
@@ -83,10 +83,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
   private isErrorResponseDto(obj: any): obj is ErrorResponseDto {
     return (
       obj &&
-      typeof obj === "object" &&
-      "message" in obj &&
-      "status" in obj &&
-      "provider" in obj
+      typeof obj === 'object' &&
+      'message' in obj &&
+      'status' in obj &&
+      'provider' in obj
     );
   }
 }

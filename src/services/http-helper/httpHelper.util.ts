@@ -18,9 +18,9 @@ import {
   UnauthorizedException,
   UnprocessableEntityException,
   UnsupportedMediaTypeException,
-} from "@nestjs/common";
-import { AxiosResponse } from "axios";
-import { ErrorResponseDto } from "../../dto/";
+} from '@nestjs/common';
+import { AxiosResponse } from 'axios';
+import { ErrorResponseDto } from '../../dto/';
 
 class TooManyRequestsException extends HttpException {
   constructor(response: ErrorResponseDto) {
@@ -34,7 +34,7 @@ export class HttpErrorHelper {
 
   validateResponse<T>(
     { data, status, statusText }: AxiosResponse<T>,
-    provider: string
+    provider: string,
   ): T {
     if (status === HttpStatus.OK || status === HttpStatus.CREATED) {
       return data;
@@ -42,7 +42,7 @@ export class HttpErrorHelper {
 
     const errorResponse: ErrorResponseDto = {
       message: statusText,
-      status: status,
+      status,
       provider,
       response: data || null,
     };
@@ -52,7 +52,7 @@ export class HttpErrorHelper {
 
   handleHttpError(
     statusCode: HttpStatus,
-    errorResponse: ErrorResponseDto
+    errorResponse: ErrorResponseDto,
   ): never {
     const exceptionMap: Record<
       number,
@@ -81,7 +81,7 @@ export class HttpErrorHelper {
     const ExceptionClass =
       exceptionMap[statusCode] || InternalServerErrorException;
 
-    this.logger.error("Api Provider Error", JSON.stringify(errorResponse));
+    this.logger.error('Api Provider Error', JSON.stringify(errorResponse));
     throw new ExceptionClass(errorResponse);
   }
 }
