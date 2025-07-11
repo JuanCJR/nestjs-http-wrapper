@@ -1,6 +1,6 @@
 {
     "name": "nestjs-http-wrapper",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "A wrapper for NestJS HttpService to standardize requests and error handling.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
