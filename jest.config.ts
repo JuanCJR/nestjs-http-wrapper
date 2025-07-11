@@ -1,0 +1,45 @@
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  moduleFileExtensions: ['js', 'jsx', 'json', 'ts', 'tsx'],
+  rootDir: '.',
+  testMatch: ['<rootDir>/src/**/*.(test|spec).ts'],
+  transform: {
+    '^.+\\.(t|j)s$': 'ts-jest',
+  },
+  collectCoverageFrom: [
+    '<rootDir>/src/**/*.{ts,js}',
+    '!<rootDir>/src/**/*.{d.ts,interface.ts}',
+    '!<rootDir>/src/**/*.module.ts',
+    '!<rootDir>/src/main.ts',
+    '!<rootDir>/src/config.ts',
+    '!<rootDir>/src/**/logger.ts',
+    '!<rootDir>/src/**/getLogLevels.ts',
+    '!<rootDir>/src/**/swagger-doc.utils.ts',
+    '!<rootDir>/src/**/swagger.config.ts',
+    '!<rootDir>/src/common/utils/http-helper/dto/index.ts',
+  ],
+  coverageDirectory: '<rootDir>/coverage',
+  coverageReporters: ['text', 'lcov', 'html', 'json'],
+  coverageThreshold: {
+    global: {
+      branches: 70,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/dist/',
+    '<rootDir>/coverage/',
+  ],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+  setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
+  testTimeout: 10000,
+  verbose: true,
+  testResultsProcessor: 'jest-sonar-reporter',
+  collectCoverage: true,
+};
