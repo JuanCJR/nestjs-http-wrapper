@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2024-12-19
+
+### Changed
+
+- **BREAKING CHANGE**: Refactorización del tipo `HttpRequestOptions` para extender `AxiosRequestConfig` en lugar de usar un tipo personalizado limitado.
+- El `HttpServiceWrapper` ahora acepta todas las opciones de configuración disponibles en Axios, proporcionando mayor flexibilidad para configurar peticiones HTTP.
+- Simplificación del método `request` al eliminar la configuración manual de headers y usar directamente las opciones de Axios.
+
+### Added
+
+- Soporte completo para todas las opciones de configuración de Axios en las peticiones HTTP.
+- Mejor integración con el ecosistema de Axios para configuraciones avanzadas.
+
 ## [1.1.2] - 2024-07-26
 
 ### Changed

@@ -14,6 +14,8 @@ Este paquete proporciona una clase `HttpServiceWrapper` que abstrae la lógica d
 - Wrapper sobre `HttpService` de `@nestjs/axios`.
 - Manejo de errores centralizado que lanza excepciones estándar de NestJS.
 - Tipado fuerte para peticiones y respuestas.
+- **Nuevo en v1.2.0**: Soporte completo para todas las opciones de configuración de Axios.
+- **Nuevo en v1.2.0**: Mayor flexibilidad en la configuración de peticiones HTTP.
 - Fácil de integrar en cualquier proyecto NestJS.
 
 ## Instalación
@@ -45,8 +47,8 @@ Primero, importa `HttpUtilsModule` en el módulo de tu aplicación donde quieras
 
 ```typescript
 // en app.module.ts
-import { Module } from "@nestjs/common";
-import { HttpUtilsModule } from "nestjs-http-wrapper";
+import { Module } from '@nestjs/common';
+import { HttpUtilsModule } from 'nestjs-http-wrapper';
 
 @Module({
   imports: [
@@ -65,8 +67,8 @@ Ahora puedes inyectar `HttpServiceWrapper` en cualquier servicio o controlador. 
 
 ```typescript
 // en tu-servicio.service.ts
-import { Injectable } from "@nestjs/common";
-import { HttpServiceWrapper } from "nestjs-http-wrapper";
+import { Injectable } from '@nestjs/common';
+import { HttpServiceWrapper } from 'nestjs-http-wrapper';
 
 interface User {
   id: number;
@@ -84,9 +86,45 @@ export class MiServicio {
     // manejada de forma centralizada por un ExceptionFilter de NestJS.
 
     const user = await this.http.request<User>({
-      method: "get",
+      method: 'get',
       url: `https://api.ejemplo.com/users/${id}`,
-      provider: "API-Ejemplo", // Identificador para logs y trazabilidad
+      provider: 'API-Ejemplo', // Identificador para logs y trazabilidad
+    });
+
+    return user;
+  }
+
+  async obtenerUsuarioConTimeout(id: number): Promise<User> {
+    const user = await this.http.request<User>({
+      method: 'get',
+      url: `https://api.ejemplo.com/users/${id}`,
+      provider: 'API-Ejemplo',
+      timeout: 5000, // 5 segundos de timeout
+      headers: {
+        Authorization: 'Bearer token123',
+        Accept: 'application/json',
+      },
+    });
+
+    return user;
+  }
+
+  async crearUsuarioConConfiguracionAvanzada(
+    userData: Partial<User>,
+  ): Promise<User> {
+    const user = await this.http.request<User, Partial<User>>({
+      method: 'post',
+      url: 'https://api.ejemplo.com/users',
+      provider: 'API-Ejemplo',
+      data: userData,
+      timeout: 10000,
+      maxRedirects: 3,
+      withCredentials: true,
+      responseType: 'json',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': 'your-api-key',
+      },
     });
 
     return user;
@@ -104,9 +142,9 @@ Para habilitarlos de forma global en tu aplicación, regístralos en tu archivo 
 
 ```typescript
 // en main.ts
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module";
-import { HttpExceptionFilter, ResponseInterceptor } from "nestjs-http-wrapper";
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { HttpExceptionFilter, ResponseInterceptor } from 'nestjs-http-wrapper';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -174,14 +212,100 @@ Este método realiza una petición HTTP.
 
 #### `HttpRequestOptions`
 
-| Propiedad  | Tipo                                   | Descripción                                                       |
+El tipo `HttpRequestOptions` extiende `AxiosRequestConfig` de Axios, lo que significa que acepta todas las opciones de configuración disponibles en Axios. Esto proporciona máxima flexibilidad para configurar tus peticiones HTTP.
+
+**Propiedades requeridas:**
+| Propiedad | Tipo | Descripción |
+| :--------- | :------- | :---------------------------------------------------------------- |
+| `url` | `string` | La URL del endpoint. |
+| `provider` | `string` | Un nombre identificador del servicio externo para logs y errores. |
+
+**Propiedades opcionales principales:**
+| Propiedad | Tipo | Descripción |
 | :--------- | :------------------------------------- | :---------------------------------------------------------------- |
-| `method`   | `'get' \| 'post' \| 'put' \| 'delete'` | El método HTTP para la petición.                                  |
-| `url`      | `string`                               | La URL del endpoint.                                              |
-| `provider` | `string`                               | Un nombre identificador del servicio externo para logs y errores. |
-| `data`     | `TRequest` (opcional)                  | El cuerpo de la petición (payload).                               |
-| `headers`  | `Record<string, string>` (opcional)    | Cabeceras HTTP adicionales.                                       |
-| `params`   | `Record<string, unknown>` (opcional)   | Parámetros de consulta (query params) para la URL.                |
+| `method` | `'get' \| 'post' \| 'put' \| 'delete' \| 'patch' \| 'head' \| 'options'` | El método HTTP para la petición. |
+| `data` | `TRequest` | El cuerpo de la petición (payload). |
+| `headers` | `Record<string, string>` | Cabeceras HTTP adicionales. |
+| `params` | `Record<string, unknown>` | Parámetros de consulta (query params) para la URL. |
+| `timeout` | `number` | Tiempo de espera en milisegundos. |
+| `baseURL` | `string` | URL base para todas las peticiones. |
+| `auth` | `{username: string, password: string}` | Credenciales de autenticación básica. |
+| `responseType` | `'json' \| 'text' \| 'blob' \| 'arraybuffer'` | Tipo de respuesta esperada. |
+
+**Nota:** Al extender `AxiosRequestConfig`, también tienes acceso a todas las demás opciones de configuración de Axios como `proxy`, `maxRedirects`, `withCredentials`, etc.
+
+## Configuraciones Avanzadas
+
+Con la nueva implementación que extiende `AxiosRequestConfig`, puedes aprovechar todas las capacidades de Axios:
+
+### Timeouts y Reintentos
+
+```typescript
+const response = await this.http.request<Data>({
+  method: 'get',
+  url: 'https://api.ejemplo.com/data',
+  provider: 'API-Ejemplo',
+  timeout: 10000, // 10 segundos
+  maxRedirects: 5,
+  retry: 3, // Si tu configuración de Axios lo soporta
+});
+```
+
+### Autenticación
+
+```typescript
+// Autenticación básica
+const response = await this.http.request<Data>({
+  method: 'get',
+  url: 'https://api.ejemplo.com/protected',
+  provider: 'API-Ejemplo',
+  auth: {
+    username: 'user',
+    password: 'pass',
+  },
+});
+
+// Con token Bearer
+const response = await this.http.request<Data>({
+  method: 'get',
+  url: 'https://api.ejemplo.com/protected',
+  provider: 'API-Ejemplo',
+  headers: {
+    Authorization: 'Bearer your-token-here',
+  },
+});
+```
+
+### Configuración de Proxy
+
+```typescript
+const response = await this.http.request<Data>({
+  method: 'get',
+  url: 'https://api.ejemplo.com/data',
+  provider: 'API-Ejemplo',
+  proxy: {
+    host: 'proxy.example.com',
+    port: 8080,
+    auth: {
+      username: 'proxyuser',
+      password: 'proxypass',
+    },
+  },
+});
+```
+
+### Configuración de SSL/TLS
+
+```typescript
+const response = await this.http.request<Data>({
+  method: 'get',
+  url: 'https://api.ejemplo.com/data',
+  provider: 'API-Ejemplo',
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false, // Solo para desarrollo
+  }),
+});
+```
 
 ## Manejo de Errores
 

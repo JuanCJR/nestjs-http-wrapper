@@ -1,7 +1,7 @@
 {
     "name": "nestjs-http-wrapper",
     "author": "Juan C. Jimenez",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "description": "A wrapper for NestJS HttpService to standardize requests and error handling.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
