@@ -1,64 +1,33 @@
-name: CI/CD Pipeline
+name: Manual Release
 
 on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Type of version bump'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      dry_run:
+        description: 'Dry run (no actual publish)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
-  test:
+  release:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run linter
-        run: npm run lint
-
-      - name: Run tests with coverage
-        run: npm run test:coverage:lcov
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage/lcov.info
-          flags: unittests
-          name: codecov-umbrella
-
-      - name: Build project
-        run: npm run build
-
-      - name: Check build artifacts
-        run: |
-          ls -la dist/
-          test -f dist/index.js
-          test -f dist/index.d.ts
-
-  publish:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Necesario para el script de release
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
@@ -73,6 +42,9 @@ jobs:
 
       - name: Run linter
         run: npm run lint
+
+      - name: Run tests
+        run: npm test
 
       - name: Run tests with coverage
         run: npm run test:coverage:lcov
@@ -89,6 +61,12 @@ jobs:
       - name: Verify package contents
         run: npm pack --dry-run
 
+      - name: Bump version
+        if: steps.check-version.outputs.exists == 'false'
+        run: |
+          npm version ${{ github.event.inputs.version_type }} --no-git-tag-version
+          echo "NEW_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
       - name: Check if version exists in NPM
         id: check-version
         run: |
@@ -102,28 +80,31 @@ jobs:
           fi
 
       - name: Create Git tag and push
-        if: steps.check-version.outputs.exists == 'false'
+        if: steps.check-version.outputs.exists == 'false' && github.event.inputs.dry_run != 'true'
         run: |
           VERSION=$(node -p "require('./package.json').version")
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to $VERSION"
           git tag -a "v$VERSION" -m "Release version $VERSION"
+          git push origin main
           git push origin "v$VERSION"
 
       - name: Publish to NPM
-        if: steps.check-version.outputs.exists == 'false'
+        if: steps.check-version.outputs.exists == 'false' && github.event.inputs.dry_run != 'true'
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
-        if: steps.check-version.outputs.exists == 'false'
+        if: steps.check-version.outputs.exists == 'false' && github.event.inputs.dry_run != 'true'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ github.run_number }}
-          release_name: Release v${{ github.run_number }}
+          tag_name: v${{ env.NEW_VERSION }}
+          release_name: Release v${{ env.NEW_VERSION }}
           body: |
             ## Changes in this Release
 
@@ -132,7 +113,16 @@ jobs:
             ## Installation
 
             ```bash
-            npm install nestjs-http-wrapper@${{ github.run_number }}
+            npm install nestjs-http-wrapper@${{ env.NEW_VERSION }}
             ```
           draft: false
           prerelease: false
+
+      - name: Dry run summary
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          echo "## Dry Run Summary"
+          echo "Version type: ${{ github.event.inputs.version_type }}"
+          echo "New version would be: $(node -p "require('./package.json').version")"
+          echo "Package contents:"
+          npm pack --dry-run

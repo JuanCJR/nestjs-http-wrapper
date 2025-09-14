@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpErrorHelper } from '../src/services/http-helper/httpHelper.util';
 import {
-  HttpStatus,
   BadRequestException,
+  HttpStatus,
   NotFoundException,
 } from '@nestjs/common';
 import { ErrorFormatConfig } from '../src/dto/http-helper.dto';

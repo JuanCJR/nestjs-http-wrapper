@@ -109,6 +109,23 @@ module.exports = [
       '@typescript-eslint/no-unsafe-member-access': 'off',
     },
   },
+  // Configuración específica para archivos de test
+  {
+    files: ['**/*.spec.ts', '**/*.test.ts', 'test/**/*.ts'],
+    rules: {
+      // Allow any in tests
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/unbound-method': 'off',
+      // Allow undefined variables in tests (like FormData)
+      'no-undef': 'off',
+      // Allow console in tests
+      'no-console': 'off',
+    },
+  },
   {
     files: ['**/*.js'],
     languageOptions: {

@@ -1,0 +1,71 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:base",
+        ":semanticCommits"
+    ],
+    "packageRules": [
+        {
+            "matchPackageNames": [
+                "@nestjs/common",
+                "@nestjs/axios",
+                "@nestjs/core"
+            ],
+            "groupName": "nestjs core packages"
+        },
+        {
+            "matchPackageNames": [
+                "@types/node",
+                "@types/jest",
+                "@types/express"
+            ],
+            "groupName": "types packages"
+        },
+        {
+            "matchPackageNames": [
+                "eslint",
+                "@typescript-eslint/eslint-plugin",
+                "@typescript-eslint/parser"
+            ],
+            "groupName": "eslint packages"
+        },
+        {
+            "matchPackageNames": [
+                "jest",
+                "ts-jest",
+                "@types/jest"
+            ],
+            "groupName": "jest packages"
+        },
+        {
+            "matchPackageNames": [
+                "typescript",
+                "ts-node"
+            ],
+            "groupName": "typescript packages"
+        }
+    ],
+    "prConcurrentLimit": 3,
+    "prHourlyLimit": 2,
+    "labels": [
+        "dependencies"
+    ],
+    "assignees": [
+        "JuanCJR"
+    ],
+    "reviewers": [
+        "JuanCJR"
+    ],
+    "schedule": [
+        "before 9am on monday"
+    ],
+    "timezone": "America/New_York",
+    "semanticCommits": "enabled",
+    "commitMessagePrefix": "chore:",
+    "commitMessageAction": "update",
+    "commitMessageTopic": "{{depName}}",
+    "commitMessageExtra": "to {{newVersion}}",
+    "commitMessageSuffix": "",
+    "commitMessageType": "chore",
+    "commitMessageScope": "deps"
+}

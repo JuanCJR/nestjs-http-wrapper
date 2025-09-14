@@ -1,0 +1,128 @@
+name: Validate Package
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run tests with coverage
+        run: npm run test:coverage:lcov
+
+      - name: Build project
+        run: npm run build
+
+      - name: Check build artifacts
+        run: |
+          ls -la dist/
+          test -f dist/index.js
+          test -f dist/index.d.ts
+
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json..."
+          npm pkg get name version description main types
+          echo "Package name: $(npm pkg get name)"
+          echo "Package version: $(npm pkg get version)"
+          echo "Package description: $(npm pkg get description)"
+
+      - name: Check package contents
+        run: |
+          echo "Checking what files would be published..."
+          npm pack --dry-run
+          echo "Package size: $(npm pack --dry-run | wc -c) bytes"
+
+      - name: Validate TypeScript types
+        run: |
+          echo "Validating TypeScript types..."
+          npx tsc --noEmit --project tsconfig.json
+
+      - name: Check for security vulnerabilities
+        run: |
+          echo "Checking for security vulnerabilities..."
+          npm audit --audit-level moderate
+
+      - name: Validate repository URLs
+        run: |
+          echo "Validating repository URLs..."
+          REPO_URL=$(npm pkg get repository.url | tr -d '"')
+          HOMEPAGE_URL=$(npm pkg get homepage | tr -d '"')
+          BUGS_URL=$(npm pkg get bugs.url | tr -d '"')
+
+          echo "Repository URL: $REPO_URL"
+          echo "Homepage URL: $HOMEPAGE_URL"
+          echo "Bugs URL: $BUGS_URL"
+
+          # Validate URLs are not empty
+          if [ -z "$REPO_URL" ] || [ "$REPO_URL" = "null" ]; then
+            echo "❌ Repository URL is missing or invalid"
+            exit 1
+          fi
+
+          if [ -z "$HOMEPAGE_URL" ] || [ "$HOMEPAGE_URL" = "null" ]; then
+            echo "❌ Homepage URL is missing or invalid"
+            exit 1
+          fi
+
+          if [ -z "$BUGS_URL" ] || [ "$BUGS_URL" = "null" ]; then
+            echo "❌ Bugs URL is missing or invalid"
+            exit 1
+          fi
+
+          echo "✅ All URLs are valid"
+
+      - name: Check license file
+        run: |
+          echo "Checking license file..."
+          if [ -f "LICENSE" ]; then
+            echo "✅ LICENSE file exists"
+            head -5 LICENSE
+          else
+            echo "❌ LICENSE file is missing"
+            exit 1
+          fi
+
+      - name: Check README
+        run: |
+          echo "Checking README..."
+          if [ -f "README.md" ]; then
+            echo "✅ README.md exists"
+            echo "README size: $(wc -c < README.md) bytes"
+          else
+            echo "❌ README.md is missing"
+            exit 1
+          fi
+
+      - name: Check CHANGELOG
+        run: |
+          echo "Checking CHANGELOG..."
+          if [ -f "CHANGELOG.md" ]; then
+            echo "✅ CHANGELOG.md exists"
+            echo "CHANGELOG size: $(wc -c < CHANGELOG.md) bytes"
+          else
+            echo "❌ CHANGELOG.md is missing"
+            exit 1
+          fi
