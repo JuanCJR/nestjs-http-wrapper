@@ -2,6 +2,9 @@
 
 [![NPM Version](https://img.shields.io/npm/v/nestjs-http-wrapper.svg)](https://www.npmjs.com/package/nestjs-http-wrapper)
 [![License](https://img.shields.io/npm/l/nestjs-http-wrapper.svg)](https://opensource.org/licenses/ISC)
+[![Tests](https://img.shields.io/badge/tests-74%20passed-brightgreen.svg)](https://github.com/JuanCJR/nestjs-http-wrapper)
+[![Coverage](https://img.shields.io/badge/coverage-100%25%20statements%20%7C%2088.37%25%20branches-brightgreen.svg)](https://github.com/JuanCJR/nestjs-http-wrapper)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 
 Un wrapper simple y robusto para el `HttpService` de NestJS que estandariza las peticiones HTTP y el manejo de errores.
 
@@ -20,6 +23,51 @@ Este paquete proporciona una clase `HttpServiceWrapper` que abstrae la lógica d
 - **Nuevo en v1.3.0**: Configuración flexible del formato de respuestas de error.
 - **Nuevo en v1.3.0**: Soporte para campos adicionales en respuestas de error.
 - Fácil de integrar en cualquier proyecto NestJS.
+
+## Cobertura de Tests
+
+Este proyecto mantiene una alta cobertura de tests para garantizar la calidad y confiabilidad del código:
+
+| Métrica        | Cobertura | Estado |
+| -------------- | --------- | ------ |
+| **Statements** | 100%      | ✅     |
+| **Branches**   | 88.37%    | ✅     |
+| **Functions**  | 100%      | ✅     |
+| **Lines**      | 100%      | ✅     |
+
+### Detalles por Módulo
+
+| Módulo                            | Statements | Branches | Functions | Lines |
+| --------------------------------- | ---------- | -------- | --------- | ----- |
+| **filters**                       | 100%       | 81.48%   | 100%      | 100%  |
+| **interceptors**                  | 100%       | 100%     | 100%      | 100%  |
+| **services/http-helper**          | 100%       | 100%     | 100%      | 100%  |
+| **services/http-service-wrapper** | 100%       | 100%     | 100%      | 100%  |
+
+### Ejecutar Tests
+
+```bash
+# Ejecutar todos los tests
+npm test
+
+# Ejecutar tests con cobertura (texto)
+npm run test:coverage
+
+# Ejecutar tests con cobertura HTML (abre en navegador)
+npm run test:coverage:html
+
+# Ejecutar tests con cobertura LCOV (para CI/CD)
+npm run test:coverage:lcov
+
+# Ejecutar tests en modo watch
+npm run test:watch
+
+# Ejecutar tests específicos
+npm test -- --testPathPattern=http-helper
+
+# Ejecutar tests en modo debug
+npm run test:debug
+```
 
 ## Instalación
 
@@ -494,9 +542,55 @@ const errorConfig: ErrorFormatConfig = {
 - **Consistencia**: Mantiene un formato estándar mientras permite personalización.
 - **Backward Compatible**: No afecta el comportamiento existente del código.
 
+## Estado del Proyecto
+
+### Calidad del Código
+
+- ✅ **74 tests** pasando exitosamente
+- ✅ **100% cobertura** de statements, functions y lines
+- ✅ **88.37% cobertura** de branches
+- ✅ **TypeScript** con tipado estricto
+- ✅ **ESLint** configurado para mantener estándares de código
+- ✅ **Jest** para testing unitario
+- ✅ **Semantic Versioning** para versionado
+
+### CI/CD
+
+Este proyecto utiliza GitHub Actions para:
+
+- Ejecutar tests automáticamente en cada push
+- Verificar cobertura de código
+- Validar linting y formato
+- Publicar automáticamente en NPM
+
+### Métricas de Calidad
+
+| Métrica              | Valor    | Objetivo |
+| -------------------- | -------- | -------- |
+| Tests                | 74/74 ✅ | 100%     |
+| Cobertura Statements | 100%     | ≥80%     |
+| Cobertura Branches   | 88.37%   | ≥70%     |
+| Cobertura Functions  | 100%     | ≥80%     |
+| Cobertura Lines      | 100%     | ≥80%     |
+
 ## Contribuciones
 
 Las contribuciones son bienvenidas. Por favor, abre un issue o un pull request para discutir los cambios.
+
+### Guías para Contribuir
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -m 'feat: agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
+
+### Estándares de Código
+
+- Sigue las convenciones de TypeScript
+- Mantén la cobertura de tests por encima del 80%
+- Asegúrate de que todos los tests pasen
+- Actualiza la documentación cuando sea necesario
 
 ## Licencia
 
