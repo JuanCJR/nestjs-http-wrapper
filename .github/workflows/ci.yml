@@ -102,22 +102,26 @@ jobs:
           if npm view nestjs-http-wrapper@$VERSION version > /dev/null 2>&1; then
             echo "npm_exists=true" >> $GITHUB_OUTPUT
             echo "Version $VERSION already exists in NPM"
+            NPM_EXISTS=true
           else
             echo "npm_exists=false" >> $GITHUB_OUTPUT
             echo "Version $VERSION is not in NPM"
+            NPM_EXISTS=false
           fi
 
           # Check if git tag exists
           if git rev-parse "v$VERSION" >/dev/null 2>&1; then
             echo "git_tag_exists=true" >> $GITHUB_OUTPUT
             echo "Git tag v$VERSION already exists"
+            GIT_TAG_EXISTS=true
           else
             echo "git_tag_exists=false" >> $GITHUB_OUTPUT
             echo "Git tag v$VERSION does not exist"
+            GIT_TAG_EXISTS=false
           fi
 
           # Determine if we should proceed with publishing
-          if [ "$npm_exists" = "false" ]; then
+          if [ "$NPM_EXISTS" = "false" ]; then
             echo "should_publish=true" >> $GITHUB_OUTPUT
             echo "Will proceed with publishing (version not in NPM)"
           else
