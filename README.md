@@ -16,6 +16,9 @@ Este paquete proporciona una clase `HttpServiceWrapper` que abstrae la lógica d
 - Tipado fuerte para peticiones y respuestas.
 - **Nuevo en v1.2.0**: Soporte completo para todas las opciones de configuración de Axios.
 - **Nuevo en v1.2.0**: Mayor flexibilidad en la configuración de peticiones HTTP.
+- **Nuevo en v1.3.0**: Manejo personalizado de errores con mensajes y códigos personalizados.
+- **Nuevo en v1.3.0**: Configuración flexible del formato de respuestas de error.
+- **Nuevo en v1.3.0**: Soporte para campos adicionales en respuestas de error.
 - Fácil de integrar en cualquier proyecto NestJS.
 
 ## Instalación
@@ -234,6 +237,29 @@ El tipo `HttpRequestOptions` extiende `AxiosRequestConfig` de Axios, lo que sign
 
 **Nota:** Al extender `AxiosRequestConfig`, también tienes acceso a todas las demás opciones de configuración de Axios como `proxy`, `maxRedirects`, `withCredentials`, etc.
 
+### `HttpErrorHelper`
+
+El servicio `HttpErrorHelper` proporciona utilidades para el manejo de errores HTTP.
+
+#### `handleCustomError(statusCode: HttpStatus, provider: string, errorConfig: ErrorFormatConfig, originalData?: any): never`
+
+Método para manejar errores con configuración personalizada.
+
+- **`statusCode`**: Código de estado HTTP del error.
+- **`provider`**: Nombre del proveedor de la API para identificación en logs.
+- **`errorConfig`**: Configuración personalizada del error (mensaje, código, campos adicionales).
+- **`originalData`**: Datos originales de la respuesta (opcional).
+
+#### `ErrorFormatConfig`
+
+```typescript
+interface ErrorFormatConfig {
+  customMessage?: string; // Mensaje personalizado de error
+  customCode?: string; // Código de error personalizado
+  additionalFields?: Record<string, any>; // Campos adicionales personalizados
+}
+```
+
 ## Configuraciones Avanzadas
 
 Con la nueva implementación que extiende `AxiosRequestConfig`, puedes aprovechar todas las capacidades de Axios:
@@ -323,6 +349,150 @@ export class ErrorResponseDto {
 ```
 
 Esto te permite usar los filtros de excepciones de NestJS (`ExceptionFilter`) para capturar y formatear las respuestas de error de manera global y consistente.
+
+## Manejo Personalizado de Errores (v1.3.0)
+
+### Configuración de Errores Personalizados
+
+A partir de la versión 1.3.0, puedes personalizar completamente el formato de las respuestas de error usando el método `handleCustomError` del `HttpErrorHelper`.
+
+#### Interfaz ErrorFormatConfig
+
+```typescript
+interface ErrorFormatConfig {
+  customMessage?: string; // Mensaje personalizado de error
+  customCode?: string; // Código de error personalizado
+  additionalFields?: Record<string, any>; // Campos adicionales
+}
+```
+
+#### Ejemplo de Uso
+
+```typescript
+import { Injectable, HttpStatus } from '@nestjs/common';
+import { HttpErrorHelper } from 'nestjs-http-wrapper';
+import { ErrorFormatConfig } from 'nestjs-http-wrapper';
+
+@Injectable()
+export class StoreService {
+  constructor(private readonly httpErrorHelper: HttpErrorHelper) {}
+
+  async getStoreById(storeId: string) {
+    try {
+      // Tu lógica de negocio aquí
+      const response = await this.httpClient.get(`/api/stores/${storeId}`);
+      return response.data;
+    } catch (error) {
+      if (error.status === 404) {
+        // Configuración personalizada para error 404
+        const errorConfig: ErrorFormatConfig = {
+          customMessage:
+            'No encontramos esta tienda. Vuelve al inicio e intenta nuevamente.',
+          customCode: 'store_not_found',
+          additionalFields: {
+            errorType: 'NOT_FOUND',
+            retryable: false,
+            suggestedAction: 'check_store_id',
+          },
+        };
+
+        this.httpErrorHelper.handleCustomError(
+          HttpStatus.NOT_FOUND,
+          'Store API',
+          errorConfig,
+          { storeId, timestamp: new Date().toISOString() },
+        );
+      }
+      throw error;
+    }
+  }
+}
+```
+
+#### Respuesta de Error Personalizada
+
+Con la configuración anterior, la respuesta de error será:
+
+```json
+{
+  "data": null,
+  "error": {
+    "status": 404,
+    "message": [
+      "No encontramos esta tienda. Vuelve al inicio e intenta nuevamente."
+    ],
+    "error": "API Error from Store API",
+    "statusCode": 404,
+    "timestamp": "2024-01-15T10:30:00.000Z",
+    "path": "/api/stores/123",
+    "method": "GET",
+    "provider": "Store API",
+    "code": "store_not_found",
+    "errorType": "NOT_FOUND",
+    "retryable": false,
+    "suggestedAction": "check_store_id"
+  },
+  "success": false,
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+```
+
+#### Casos de Uso Comunes
+
+**1. Errores de Validación con Códigos Específicos**
+
+```typescript
+const errorConfig: ErrorFormatConfig = {
+  customMessage: 'La categoría especificada no es válida.',
+  customCode: 'invalid_category',
+  additionalFields: {
+    errorType: 'VALIDATION_ERROR',
+    retryable: true,
+    validCategories: ['electronics', 'clothing', 'books'],
+  },
+};
+```
+
+**2. Errores de Autenticación con Información de Seguridad**
+
+```typescript
+const errorConfig: ErrorFormatConfig = {
+  customMessage:
+    'Token de acceso expirado. Por favor, inicia sesión nuevamente.',
+  customCode: 'token_expired',
+  additionalFields: {
+    errorType: 'AUTHENTICATION_ERROR',
+    retryable: false,
+    requiresReauth: true,
+    expiresAt: '2024-01-15T12:00:00.000Z',
+  },
+};
+```
+
+**3. Errores de Límite de Rate con Información de Reintento**
+
+```typescript
+const errorConfig: ErrorFormatConfig = {
+  customMessage:
+    'Has excedido el límite de peticiones. Intenta nuevamente en unos minutos.',
+  customCode: 'rate_limit_exceeded',
+  additionalFields: {
+    errorType: 'RATE_LIMIT_ERROR',
+    retryable: true,
+    retryAfter: 300, // segundos
+    currentLimit: 100,
+    resetTime: '2024-01-15T12:05:00.000Z',
+  },
+};
+```
+
+### Ventajas del Manejo Personalizado
+
+- **Mensajes de Usuario**: Proporciona mensajes de error más amigables y específicos para el contexto de tu aplicación.
+- **Códigos de Error**: Permite identificar errores específicos de manera programática.
+- **Metadatos Adicionales**: Incluye información contextual que puede ser útil para debugging o para la lógica del frontend.
+- **Consistencia**: Mantiene un formato estándar mientras permite personalización.
+- **Backward Compatible**: No afecta el comportamiento existente del código.
 
 ## Contribuciones
 

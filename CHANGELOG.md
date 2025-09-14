@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-09-14
+
+### Added
+
+- **Custom Error Handling**: New `handleCustomError` method in `HttpErrorHelper` for customizable error responses.
+- **Error Format Configuration**: New `ErrorFormatConfig` interface allowing customization of error messages, codes, and additional fields.
+- **Custom Error Codes**: Support for custom error codes in `ErrorResponseDto` via the new `code` field.
+- **Additional Fields Support**: Ability to include custom metadata in error responses through `additionalFields`.
+- **Comprehensive Examples**: Complete example implementation showing how to use custom error handling in real-world scenarios.
+- **Enhanced Testing**: 7 new test cases covering all custom error handling functionality.
+
+### Enhanced
+
+- **ErrorResponseDto**: Added optional `code` field for custom error identification.
+- **HttpErrorHelper**: Extended with `handleCustomError` method for advanced error customization.
+- **Type Safety**: Improved TypeScript support with proper typing for all new features.
+
+### Documentation
+
+- **Updated README**: Added comprehensive documentation for custom error handling features.
+- **Code Examples**: Included practical examples demonstrating custom error configuration.
+- **API Documentation**: Enhanced API documentation with new method signatures and interfaces.
+
 ## [1.2.0] - 2024-12-19
 
 ### Changed
