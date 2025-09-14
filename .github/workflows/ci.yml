@@ -93,20 +93,40 @@ jobs:
       - name: Verify package contents
         run: npm pack --dry-run
 
-      - name: Check if version exists in NPM
-        id: check-version
+      - name: Check version status
+        id: version-check
         run: |
           VERSION=$(node -p "require('./package.json').version")
+
+          # Check if version exists in NPM
           if npm view nestjs-http-wrapper@$VERSION version > /dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "npm_exists=true" >> $GITHUB_OUTPUT
             echo "Version $VERSION already exists in NPM"
           else
-            echo "exists=false" >> $GITHUB_OUTPUT
-            echo "Version $VERSION is new"
+            echo "npm_exists=false" >> $GITHUB_OUTPUT
+            echo "Version $VERSION is not in NPM"
+          fi
+
+          # Check if git tag exists
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "git_tag_exists=true" >> $GITHUB_OUTPUT
+            echo "Git tag v$VERSION already exists"
+          else
+            echo "git_tag_exists=false" >> $GITHUB_OUTPUT
+            echo "Git tag v$VERSION does not exist"
+          fi
+
+          # Determine if we should proceed with publishing
+          if [ "$npm_exists" = "false" ]; then
+            echo "should_publish=true" >> $GITHUB_OUTPUT
+            echo "Will proceed with publishing (version not in NPM)"
+          else
+            echo "should_publish=false" >> $GITHUB_OUTPUT
+            echo "Skipping publishing (version already in NPM)"
           fi
 
       - name: Create Git tag and push
-        if: steps.check-version.outputs.exists == 'false'
+        if: steps.version-check.outputs.should_publish == 'true' && steps.version-check.outputs.git_tag_exists == 'false'
         run: |
           VERSION=$(node -p "require('./package.json').version")
           git config --local user.email "action@github.com"
@@ -115,7 +135,7 @@ jobs:
           git push origin "v$VERSION"
 
       - name: Configure NPM
-        if: steps.check-version.outputs.exists == 'false'
+        if: steps.version-check.outputs.should_publish == 'true'
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           npm config set registry https://registry.npmjs.org/
@@ -125,13 +145,13 @@ jobs:
           echo "Auth token configured: $(npm config get //registry.npmjs.org/:_authToken | cut -c1-10)..."
 
       - name: Publish to NPM
-        if: steps.check-version.outputs.exists == 'false'
+        if: steps.version-check.outputs.should_publish == 'true'
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
-        if: steps.check-version.outputs.exists == 'false'
+        if: steps.version-check.outputs.should_publish == 'true'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v$(node -p "require('./package.json').version")
