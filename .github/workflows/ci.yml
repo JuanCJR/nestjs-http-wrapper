@@ -114,6 +114,16 @@ jobs:
           git tag -a "v$VERSION" -m "Release version $VERSION"
           git push origin "v$VERSION"
 
+      - name: Configure NPM
+        if: steps.check-version.outputs.exists == 'false'
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          npm config set registry https://registry.npmjs.org/
+          npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+          echo "NPM configuration completed"
+          echo "Registry: $(npm config get registry)"
+          echo "Auth token configured: $(npm config get //registry.npmjs.org/:_authToken | cut -c1-10)..."
+
       - name: Publish to NPM
         if: steps.check-version.outputs.exists == 'false'
         run: npm publish
