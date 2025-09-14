@@ -17,8 +17,8 @@ export class HttpServiceWrapper {
   private readonly logger = new Logger(HttpServiceWrapper.name);
 
   constructor(
-    private httpService: HttpService,
-    private httpErrorHelper: HttpErrorHelper,
+    private readonly httpService: HttpService,
+    private readonly httpErrorHelper: HttpErrorHelper,
   ) {}
 
   async request<TResponse, TRequest = unknown>(
