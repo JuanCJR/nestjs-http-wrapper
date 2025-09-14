@@ -9,4 +9,18 @@ export class ErrorResponseDto {
   provider: string;
   @ApiProperty({ required: false })
   response?: any;
+  @ApiProperty({
+    required: false,
+    description: 'Custom error code',
+  })
+  code?: string;
+}
+
+/**
+ * Configuration for customizing error response format
+ */
+export interface ErrorFormatConfig {
+  customMessage?: string;
+  customCode?: string;
+  additionalFields?: Record<string, any>;
 }

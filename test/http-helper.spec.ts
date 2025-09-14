@@ -1,22 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import {
-  HttpStatus,
-  NotFoundException,
   BadRequestException,
-  UnauthorizedException,
-  InternalServerErrorException,
+  ConflictException,
   ForbiddenException,
+  GoneException,
+  HttpException,
+  HttpStatus,
+  ImATeapotException,
+  InternalServerErrorException,
   MethodNotAllowedException,
   NotAcceptableException,
-  RequestTimeoutException,
-  ConflictException,
-  GoneException,
+  NotFoundException,
   PayloadTooLargeException,
-  UnsupportedMediaTypeException,
-  ImATeapotException,
-  UnprocessableEntityException,
+  RequestTimeoutException,
   ServiceUnavailableException,
-  HttpException,
+  UnauthorizedException,
+  UnprocessableEntityException,
+  UnsupportedMediaTypeException,
 } from '@nestjs/common';
 import { HttpErrorHelper } from '../src/services/http-helper/httpHelper.util';
 import { AxiosResponse } from 'axios';

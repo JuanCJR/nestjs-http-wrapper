@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { HttpErrorHelper } from '../http-helper/httpHelper.util';
 import { AxiosRequestConfig } from 'axios';
@@ -14,11 +14,9 @@ export type HttpRequestOptions<TRequest = unknown> = AxiosRequestConfig & {
 
 @Injectable()
 export class HttpServiceWrapper {
-  private readonly logger = new Logger(HttpServiceWrapper.name);
-
   constructor(
-    private httpService: HttpService,
-    private httpErrorHelper: HttpErrorHelper,
+    private readonly httpService: HttpService,
+    private readonly httpErrorHelper: HttpErrorHelper,
   ) {}
 
   async request<TResponse, TRequest = unknown>(

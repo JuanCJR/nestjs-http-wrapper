@@ -20,7 +20,7 @@ import {
   UnsupportedMediaTypeException,
 } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
-import { ErrorResponseDto } from '../../dto/';
+import { ErrorFormatConfig, ErrorResponseDto } from '../../dto/';
 
 class TooManyRequestsException extends HttpException {
   constructor(response: ErrorResponseDto) {
@@ -30,13 +30,13 @@ class TooManyRequestsException extends HttpException {
 
 @Injectable()
 export class HttpErrorHelper {
-  private logger = new Logger(HttpErrorHelper.name);
+  private readonly logger = new Logger(HttpErrorHelper.name);
 
   validateResponse<T>(
     { data, status, statusText }: AxiosResponse<T>,
     provider: string,
   ): T {
-    if (status === HttpStatus.OK || status === HttpStatus.CREATED) {
+    if (status === 200 || status === 201) {
       return data;
     }
 
@@ -79,9 +79,34 @@ export class HttpErrorHelper {
     };
 
     const ExceptionClass =
-      exceptionMap[statusCode] || InternalServerErrorException;
+      exceptionMap[statusCode] ?? InternalServerErrorException;
 
     this.logger.error('Api Provider Error', JSON.stringify(errorResponse));
     throw new ExceptionClass(errorResponse);
+  }
+
+  /**
+   * Specific method for handling errors with custom configuration
+   * @param statusCode - HTTP status code
+   * @param provider - API provider name
+   * @param errorConfig - Custom configuration for the error
+   * @param originalData - Original response data (optional)
+   */
+  handleCustomError(
+    statusCode: HttpStatus,
+    provider: string,
+    errorConfig: ErrorFormatConfig,
+    originalData?: unknown,
+  ): never {
+    const errorResponse: ErrorResponseDto = {
+      message: errorConfig.customMessage ?? 'Error occurred',
+      status: statusCode,
+      provider,
+      response: originalData ?? null,
+      ...(errorConfig.customCode && { code: errorConfig.customCode }),
+      ...(errorConfig.additionalFields ?? {}),
+    };
+
+    this.handleHttpError(statusCode, errorResponse);
   }
 }

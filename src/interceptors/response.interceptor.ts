@@ -13,7 +13,7 @@ export class ResponseInterceptor<T>
   implements NestInterceptor<T, GenericResponse<T>>
 {
   intercept(
-    context: ExecutionContext,
+    _context: ExecutionContext,
     next: CallHandler,
   ): Observable<GenericResponse<T>> {
     return next.handle().pipe(

@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import {
-  HttpServiceWrapper,
   HttpRequestOptions,
+  HttpServiceWrapper,
 } from '../src/services/http-service-wrapper/http-service-wrapper.utils';
 import { HttpErrorHelper } from '../src/services/http-helper/httpHelper.util';
 import { of } from 'rxjs';
@@ -67,11 +67,7 @@ describe('HttpServiceWrapper', () => {
       expect(httpService.request).toHaveBeenCalledWith({
         method: 'get',
         url: 'https://api.test.com/users',
-        data: undefined,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        params: undefined,
+        provider: 'TestAPI',
         validateStatus: expect.any(Function),
       });
       expect(httpErrorHelper.validateResponse).toHaveBeenCalledWith(
@@ -107,10 +103,7 @@ describe('HttpServiceWrapper', () => {
         method: 'post',
         url: 'https://api.test.com/users',
         data: requestData,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        params: undefined,
+        provider: 'TestAPI',
         validateStatus: expect.any(Function),
       });
       expect(result).toEqual({ id: 2, name: 'Created User' });
@@ -145,10 +138,9 @@ describe('HttpServiceWrapper', () => {
         url: 'https://api.test.com/users/1',
         data: requestData,
         headers: {
-          'Content-Type': 'application/json',
           Authorization: 'Bearer token123',
         },
-        params: undefined,
+        provider: 'TestAPI',
         validateStatus: expect.any(Function),
       });
       expect(result).toEqual({ id: 1, name: 'Updated User' });
@@ -177,11 +169,7 @@ describe('HttpServiceWrapper', () => {
       expect(httpService.request).toHaveBeenCalledWith({
         method: 'delete',
         url: 'https://api.test.com/users/1',
-        data: undefined,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        params: undefined,
+        provider: 'TestAPI',
         validateStatus: expect.any(Function),
       });
       expect(result).toEqual({ message: 'User deleted' });
@@ -212,11 +200,8 @@ describe('HttpServiceWrapper', () => {
       expect(httpService.request).toHaveBeenCalledWith({
         method: 'get',
         url: 'https://api.test.com/users',
-        data: undefined,
-        headers: {
-          'Content-Type': 'application/json',
-        },
         params: queryParams,
+        provider: 'TestAPI',
         validateStatus: expect.any(Function),
       });
       expect(result).toEqual([{ id: 1, name: 'User 1' }]);
@@ -251,7 +236,7 @@ describe('HttpServiceWrapper', () => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        params: undefined,
+        provider: 'TestAPI',
         validateStatus: expect.any(Function),
       });
     });
@@ -276,8 +261,8 @@ describe('HttpServiceWrapper', () => {
 
       await service.request(options);
 
-      const requestCall = httpService.request.mock.calls[0][0];
-      const validateStatusFn = requestCall.validateStatus;
+      const requestCall = httpService.request.mock.calls[0]?.[0];
+      const validateStatusFn = requestCall?.validateStatus;
 
       expect(validateStatusFn).toBeDefined();
       if (validateStatusFn) {
