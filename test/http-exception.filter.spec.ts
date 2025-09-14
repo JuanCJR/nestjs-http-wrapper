@@ -116,6 +116,50 @@ describe('HttpExceptionFilter', () => {
       });
     });
 
+    it('should handle HttpException with ErrorResponseDto including custom code and additional fields', () => {
+      // Arrange
+      const errorDto: ErrorResponseDto = {
+        message:
+          'No encontramos esta tienda. Vuelve al inicio e intenta nuevamente.',
+        status: HttpStatus.NOT_FOUND,
+        provider: 'hub-bff',
+        code: 'store_not_found',
+        facilityId: '3661',
+        country: 'CL',
+        xCommerce: 'falabella',
+      };
+      const exception = new HttpException(errorDto, HttpStatus.NOT_FOUND);
+
+      // Act
+      filter.catch(exception, mockArgumentsHost);
+
+      // Assert
+      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        data: null,
+        error: {
+          status: HttpStatus.NOT_FOUND,
+          message: [
+            'No encontramos esta tienda. Vuelve al inicio e intenta nuevamente.',
+          ],
+          error: 'API Error from hub-bff',
+          statusCode: HttpStatus.NOT_FOUND,
+          timestamp: '2024-01-01T00:00:00.000Z',
+          path: '/test',
+          method: 'GET',
+          provider: 'hub-bff',
+          code: 'store_not_found',
+          additionalFields: {
+            facilityId: '3661',
+            country: 'CL',
+            xCommerce: 'falabella',
+          },
+        },
+        success: false,
+        timestamp: '2024-01-01T00:00:00.000Z',
+      });
+    });
+
     it('should handle HttpException with object response', () => {
       // Arrange
       const errorResponse = {

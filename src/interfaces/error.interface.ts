@@ -24,4 +24,13 @@ export class GenericError {
 
   @ApiProperty()
   method: string;
+
+  @ApiProperty({ required: false })
+  provider?: string;
+
+  @ApiProperty({ required: false })
+  code?: string;
+
+  @ApiProperty({ required: false })
+  additionalFields?: Record<string, any>;
 }

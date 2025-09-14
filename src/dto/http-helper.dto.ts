@@ -14,6 +14,7 @@ export class ErrorResponseDto {
     description: 'Custom error code',
   })
   code?: string;
+  [key: string]: any; // Allow additional properties
 }
 
 /**

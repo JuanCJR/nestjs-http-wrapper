@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2025-01-14
+
+### Fixed
+
+- **Error Response Fields**: Fixed issue where `additionalFields` and `customCode` from `ErrorFormatConfig` were not being included in the final error response.
+- **HttpExceptionFilter**: Enhanced error response processing to properly extract and include custom fields from `ErrorResponseDto`.
+
+### Enhanced
+
+- **GenericError Interface**: Added optional fields `provider`, `code`, and `additionalFields` to support custom error metadata.
+- **ErrorResponseDto**: Added support for dynamic properties to accommodate additional fields from `ErrorFormatConfig`.
+- **Error Response Structure**: Improved error response structure to include all custom fields in the final API response.
+
+### Added
+
+- **Comprehensive Testing**: Added test case to verify that additional fields and custom codes are properly included in error responses.
+- **Example Documentation**: Created practical example showing how to use custom error fields in real-world scenarios.
+
 ## [1.3.0] - 2025-09-14
 
 ### Added

@@ -24,6 +24,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let error: string;
     let provider: string | undefined;
 
+    let additionalFields: Record<string, any> | undefined;
+    let customCode: string | undefined;
+
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const errorResponse = exception.getResponse();
@@ -36,6 +39,23 @@ export class HttpExceptionFilter implements ExceptionFilter {
         message = errorResponse.message;
         error = `API Error from ${errorResponse.provider}`;
         provider = errorResponse.provider;
+
+        // Extract additional fields and custom code from the error response
+        const { code } = errorResponse;
+        customCode = code;
+
+        // Extract additional fields (everything except the standard ErrorResponseDto properties)
+        const {
+          message: _message,
+          status: _status,
+          provider: _provider,
+          response: _response,
+          code: _code,
+          ...extraFields
+        } = errorResponse;
+        if (Object.keys(extraFields).length > 0) {
+          additionalFields = extraFields;
+        }
       } else {
         const errorObj = errorResponse as Record<string, unknown>;
         message = (errorObj['message'] as string) ?? exception.message;
@@ -77,6 +97,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
             ],
         error,
         ...errorDetails,
+        ...(customCode && { code: customCode }),
+        ...(additionalFields && { additionalFields }),
       },
       success: false,
       timestamp: errorDetails.timestamp,
