@@ -37,8 +37,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
         error = `API Error from ${errorResponse.provider}`;
         provider = errorResponse.provider;
       } else {
-        message = (errorResponse as any).message ?? exception.message;
-        error = (errorResponse as any).error ?? 'Http Exception';
+        const errorObj = errorResponse as Record<string, unknown>;
+        message = (errorObj['message'] as string) ?? exception.message;
+        error = (errorObj['error'] as string) ?? 'Http Exception';
       }
     } else {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -84,9 +85,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     response.status(status).json(errorResponse);
   }
 
-  private isErrorResponseDto(obj: any): obj is ErrorResponseDto {
+  private isErrorResponseDto(obj: unknown): obj is ErrorResponseDto {
     return (
-      obj &&
+      obj !== null &&
       typeof obj === 'object' &&
       'message' in obj &&
       'status' in obj &&

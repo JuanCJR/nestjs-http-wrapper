@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import {
-  HttpServiceWrapper,
   HttpRequestOptions,
+  HttpServiceWrapper,
 } from '../src/services/http-service-wrapper/http-service-wrapper.utils';
 import { HttpErrorHelper } from '../src/services/http-helper/httpHelper.util';
 import { of } from 'rxjs';
@@ -261,8 +261,8 @@ describe('HttpServiceWrapper', () => {
 
       await service.request(options);
 
-      const requestCall = httpService.request.mock.calls[0][0];
-      const validateStatusFn = requestCall.validateStatus;
+      const requestCall = httpService.request.mock.calls[0]?.[0];
+      const validateStatusFn = requestCall?.validateStatus;
 
       expect(validateStatusFn).toBeDefined();
       if (validateStatusFn) {

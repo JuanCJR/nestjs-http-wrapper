@@ -20,7 +20,7 @@ import {
   UnsupportedMediaTypeException,
 } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
-import { ErrorResponseDto, ErrorFormatConfig } from '../../dto/';
+import { ErrorFormatConfig, ErrorResponseDto } from '../../dto/';
 
 class TooManyRequestsException extends HttpException {
   constructor(response: ErrorResponseDto) {
@@ -36,7 +36,7 @@ export class HttpErrorHelper {
     { data, status, statusText }: AxiosResponse<T>,
     provider: string,
   ): T {
-    if (status === HttpStatus.OK || status === HttpStatus.CREATED) {
+    if (status === 200 || status === 201) {
       return data;
     }
 
@@ -79,7 +79,7 @@ export class HttpErrorHelper {
     };
 
     const ExceptionClass =
-      exceptionMap[statusCode] || InternalServerErrorException;
+      exceptionMap[statusCode] ?? InternalServerErrorException;
 
     this.logger.error('Api Provider Error', JSON.stringify(errorResponse));
     throw new ExceptionClass(errorResponse);
@@ -96,15 +96,15 @@ export class HttpErrorHelper {
     statusCode: HttpStatus,
     provider: string,
     errorConfig: ErrorFormatConfig,
-    originalData?: any,
+    originalData?: unknown,
   ): never {
     const errorResponse: ErrorResponseDto = {
-      message: errorConfig.customMessage || 'Error occurred',
+      message: errorConfig.customMessage ?? 'Error occurred',
       status: statusCode,
       provider,
-      response: originalData || null,
+      response: originalData ?? null,
       ...(errorConfig.customCode && { code: errorConfig.customCode }),
-      ...(errorConfig.additionalFields || {}),
+      ...(errorConfig.additionalFields ?? {}),
     };
 
     this.handleHttpError(statusCode, errorResponse);
