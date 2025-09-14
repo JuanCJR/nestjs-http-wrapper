@@ -126,7 +126,7 @@ describe('HttpExceptionFilter', () => {
         code: 'store_not_found',
         facilityId: '3661',
         country: 'CL',
-        xCommerce: 'falabella',
+        xCommerce: 'ecommerce',
       };
       const exception = new HttpException(errorDto, HttpStatus.NOT_FOUND);
 
@@ -152,7 +152,7 @@ describe('HttpExceptionFilter', () => {
           additionalFields: {
             facilityId: '3661',
             country: 'CL',
-            xCommerce: 'falabella',
+            xCommerce: 'ecommerce',
           },
         },
         success: false,

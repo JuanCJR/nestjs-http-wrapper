@@ -18,7 +18,7 @@ export class ErrorWithAdditionalFieldsExample {
       additionalFields: {
         facilityId: '3661',
         country: 'CL',
-        xCommerce: 'falabella',
+        xCommerce: 'ecommerce',
       },
     };
 
@@ -73,7 +73,7 @@ export class ErrorWithAdditionalFieldsExample {
  *     "additionalFields": {
  *       "facilityId": "3661",
  *       "country": "CL",
- *       "xCommerce": "falabella"
+ *       "xCommerce": "ecommerce"
  *     }
  *   },
  *   "success": false,

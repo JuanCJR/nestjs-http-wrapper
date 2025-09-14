@@ -22,6 +22,7 @@ Este paquete proporciona una clase `HttpServiceWrapper` que abstrae la lógica d
 - **Nuevo en v1.3.0**: Manejo personalizado de errores con mensajes y códigos personalizados.
 - **Nuevo en v1.3.0**: Configuración flexible del formato de respuestas de error.
 - **Nuevo en v1.3.0**: Soporte para campos adicionales en respuestas de error.
+- **Corregido en v1.4.1**: Los campos `additionalFields` y `customCode` ahora se incluyen correctamente en la respuesta final del filtro de excepciones.
 - Fácil de integrar en cualquier proyecto NestJS.
 
 ## Cobertura de Tests
@@ -244,6 +245,36 @@ Cuando se lanza una `HttpException` (ya sea desde tu código o desde el `HttpSer
   },
   "success": false,
   "timestamp": "2024-01-01T12:00:00.000Z"
+}
+```
+
+#### Respuesta de Error con Campos Personalizados (v1.4.1+)
+
+Cuando se usan errores personalizados con `ErrorFormatConfig`, la respuesta incluirá los campos adicionales:
+
+```json
+{
+  "data": null,
+  "error": {
+    "status": 404,
+    "message": [
+      "No encontramos esta tienda. Vuelve al inicio e intenta nuevamente."
+    ],
+    "error": "API Error from hub-bff",
+    "statusCode": 404,
+    "timestamp": "2025-09-14T16:18:31.955Z",
+    "path": "/api/scan-go-bff/v1/cart/add",
+    "method": "POST",
+    "provider": "hub-bff",
+    "code": "store_not_found",
+    "additionalFields": {
+      "facilityId": "3661",
+      "country": "CL",
+      "xCommerce": "ecommerce"
+    }
+  },
+  "success": false,
+  "timestamp": "2025-09-14T16:18:31.955Z"
 }
 ```
 
@@ -476,14 +507,18 @@ Con la configuración anterior, la respuesta de error será:
     "method": "GET",
     "provider": "Store API",
     "code": "store_not_found",
-    "errorType": "NOT_FOUND",
-    "retryable": false,
-    "suggestedAction": "check_store_id"
+    "additionalFields": {
+      "errorType": "NOT_FOUND",
+      "retryable": false,
+      "suggestedAction": "check_store_id"
+    }
   },
   "success": false,
   "timestamp": "2024-01-15T10:30:00.000Z"
 }
 ```
+
+**Nota importante (v1.4.1+)**: Los campos personalizados definidos en `additionalFields` ahora se agrupan correctamente en el objeto `additionalFields` de la respuesta final, mientras que `customCode` se incluye directamente como `code`.
 
 #### Casos de Uso Comunes
 
