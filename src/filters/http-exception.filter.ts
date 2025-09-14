@@ -31,16 +31,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
       if (typeof errorResponse === 'string') {
         message = errorResponse;
         error = exception.message;
+      } else if (this.isErrorResponseDto(errorResponse)) {
+        // Specific handling for ErrorResponseDto from HttpErrorHelper
+        message = errorResponse.message;
+        error = `API Error from ${errorResponse.provider}`;
+        provider = errorResponse.provider;
       } else {
-        // Manejo específico para ErrorResponseDto de HttpErrorHelper
-        if (this.isErrorResponseDto(errorResponse)) {
-          message = errorResponse.message;
-          error = `API Error from ${errorResponse.provider}`;
-          provider = errorResponse.provider;
-        } else {
-          message = (errorResponse as any).message ?? exception.message;
-          error = (errorResponse as any).error ?? 'Http Exception';
-        }
+        message = (errorResponse as any).message ?? exception.message;
+        error = (errorResponse as any).error ?? 'Http Exception';
       }
     } else {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -53,7 +51,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
-      ...(provider && { provider }), // Incluir provider si existe
+      ...(provider && { provider }), // Include provider if exists
     };
 
     this.logger.error(
@@ -69,7 +67,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
       data: null,
       error: {
         status,
-        message: Array.isArray(message) ? message : [String(message)],
+        message: Array.isArray(message)
+          ? message
+          : [
+              typeof message === 'object'
+                ? JSON.stringify(message)
+                : String(message),
+            ],
         error,
         ...errorDetails,
       },
