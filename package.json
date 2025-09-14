@@ -5,7 +5,7 @@
         "email": "juancarlo14071@gmail.com",
         "url": "https://github.com/JuanCJR"
     },
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "A wrapper for NestJS HttpService to standardize requests and error handling.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
