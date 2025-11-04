@@ -2,8 +2,8 @@
 
 [![NPM Version](https://img.shields.io/npm/v/nestjs-http-wrapper.svg)](https://www.npmjs.com/package/nestjs-http-wrapper)
 [![License](https://img.shields.io/npm/l/nestjs-http-wrapper.svg)](https://opensource.org/licenses/ISC)
-[![Tests](https://img.shields.io/badge/tests-74%20passed-brightgreen.svg)](https://github.com/JuanCJR/nestjs-http-wrapper)
-[![Coverage](https://img.shields.io/badge/coverage-100%25%20statements%20%7C%2088.37%25%20branches-brightgreen.svg)](https://github.com/JuanCJR/nestjs-http-wrapper)
+[![Tests](https://img.shields.io/badge/tests-76%20passed-brightgreen.svg)](https://github.com/JuanCJR/nestjs-http-wrapper)
+[![Coverage](https://img.shields.io/badge/coverage-100%25%20statements%20%7C%2093.5%25%20branches-brightgreen.svg)](https://github.com/JuanCJR/nestjs-http-wrapper)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 
 Un wrapper simple y robusto para el `HttpService` de NestJS que estandariza las peticiones HTTP y el manejo de errores.
@@ -23,6 +23,7 @@ Este paquete proporciona una clase `HttpServiceWrapper` que abstrae la lógica d
 - **Nuevo en v1.3.0**: Configuración flexible del formato de respuestas de error.
 - **Nuevo en v1.3.0**: Soporte para campos adicionales en respuestas de error.
 - **Corregido en v1.4.1**: Los campos `additionalFields` y `customCode` ahora se incluyen correctamente en la respuesta final del filtro de excepciones.
+- **Nuevo en v1.5.0**: `ResponseInterceptor` ahora permite configurar opcionalmente los campos `success` y `timestamp` mediante opciones del constructor.
 - Fácil de integrar en cualquier proyecto NestJS.
 
 ## Cobertura de Tests
@@ -214,7 +215,24 @@ bootstrap();
 
 ### Formato de Respuesta Exitosa
 
-Cuando una petición tiene éxito, el `ResponseInterceptor` la envolverá en la siguiente estructura:
+Cuando una petición tiene éxito, el `ResponseInterceptor` la envolverá en una estructura `GenericResponse`. El formato depende de las opciones configuradas:
+
+#### Comportamiento por Defecto (v1.5.0+)
+
+Por defecto, solo se incluye el campo `data`:
+
+```json
+{
+  "data": {
+    "id": 1,
+    "name": "Leanne Graham"
+  }
+}
+```
+
+#### Con Opciones Configuradas
+
+Si se configuran las opciones `includeSuccess` y/o `includeTimestamp`, se incluyen esos campos:
 
 ```json
 {
@@ -225,6 +243,22 @@ Cuando una petición tiene éxito, el `ResponseInterceptor` la envolverá en la 
   "success": true,
   "timestamp": "2024-01-01T12:00:00.000Z"
 }
+```
+
+#### Configuración del ResponseInterceptor
+
+```typescript
+// Solo incluir 'success'
+new ResponseInterceptor({ includeSuccess: true });
+
+// Solo incluir 'timestamp'
+new ResponseInterceptor({ includeTimestamp: true });
+
+// Incluir ambos
+new ResponseInterceptor({
+  includeSuccess: true,
+  includeTimestamp: true,
+});
 ```
 
 ### Formato de Respuesta de Error
@@ -581,9 +615,9 @@ const errorConfig: ErrorFormatConfig = {
 
 ### Calidad del Código
 
-- ✅ **74 tests** pasando exitosamente
+- ✅ **76 tests** pasando exitosamente
 - ✅ **100% cobertura** de statements, functions y lines
-- ✅ **88.37% cobertura** de branches
+- ✅ **93.5% cobertura** de branches
 - ✅ **TypeScript** con tipado estricto
 - ✅ **ESLint** configurado para mantener estándares de código
 - ✅ **Jest** para testing unitario
@@ -602,9 +636,9 @@ Este proyecto utiliza GitHub Actions para:
 
 | Métrica              | Valor    | Objetivo |
 | -------------------- | -------- | -------- |
-| Tests                | 74/74 ✅ | 100%     |
+| Tests                | 76/76 ✅ | 100%     |
 | Cobertura Statements | 100%     | ≥80%     |
-| Cobertura Branches   | 88.37%   | ≥70%     |
+| Cobertura Branches   | 93.5%    | ≥70%     |
 | Cobertura Functions  | 100%     | ≥80%     |
 | Cobertura Lines      | 100%     | ≥80%     |
 

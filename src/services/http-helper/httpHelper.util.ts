@@ -36,7 +36,7 @@ export class HttpErrorHelper {
     { data, status, statusText }: AxiosResponse<T>,
     provider: string,
   ): T {
-    if (status === 200 || status === 201) {
+    if (status >= 200 && status < 300) {
       return data;
     }
 

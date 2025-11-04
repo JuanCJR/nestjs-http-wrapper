@@ -8,9 +8,9 @@ export class GenericResponse<T> {
   @ApiProperty({ required: false })
   error?: GenericError;
 
-  @ApiProperty()
-  success: boolean;
+  @ApiProperty({ required: false })
+  success?: boolean;
 
-  @ApiProperty()
-  timestamp: string;
+  @ApiProperty({ required: false })
+  timestamp?: string;
 }
