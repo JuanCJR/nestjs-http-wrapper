@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-04-11
+
+### Changed
+
+- **ResponseInterceptor**: El comportamiento por defecto ahora no incluye los campos `success` y `timestamp` en la respuesta. Estos campos ahora son opcionales y se controlan mediante las opciones del constructor.
+- **ResponseInterceptorOptions**: Nueva interfaz para configurar el comportamiento del interceptor, permitiendo activar `includeSuccess` e `includeTimestamp` según sea necesario.
+
+### Enhanced
+
+- **ResponseInterceptor**: Ahora acepta opciones opcionales en el constructor (`ResponseInterceptorOptions`) para controlar qué campos adicionales se incluyen en la respuesta.
+- **Flexibilidad de Respuesta**: Permite respuestas más ligeras cuando no se necesitan los campos `success` y `timestamp`, mejorando el control sobre la estructura de respuesta.
+
+### Testing
+
+- **Tests Actualizados**: Se actualizaron todos los tests unitarios del `ResponseInterceptor` para reflejar el nuevo comportamiento opcional de los campos `success` y `timestamp`.
+- **Cobertura Completa**: Se agregaron tests para todos los escenarios: comportamiento por defecto, solo `includeSuccess`, solo `includeTimestamp`, y ambos habilitados.
+
 ## [1.4.1] - 2025-01-14
 
 ### Fixed
